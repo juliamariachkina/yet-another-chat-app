@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h3>WebSocket Test</h3>
+    <ul id="log"></ul>
+    <form id="messageForm">
+      <input type="text" id="messageInput" placeholder="Type a message..." />
+      <button type="submit">Send</button>
+    </form>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+      const socket = io('http://localhost:3000');
+      const log = document.getElementById('log');
+      const messageForm = document.getElementById('messageForm');
+      const messageInput = document.getElementById('messageInput');
+
+      messageForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const message = messageInput.value;
+        socket.emit('message', { text: message, sender: socket.id });
+        messageInput.value = '';
+      });
+
+      function addLog(msg) {
+        const li = document.createElement('li');
+        li.textContent = msg;
+        log.appendChild(li);
+      }
+
+      socket.on('connect', () => addLog('Connected: ' + socket.id));
+
+      socket.on('message', (data) => {
+        addLog(`Message from server: ${data.text}`);
+      });
+
+      socket.on('disconnect', () => addLog('Disconnected'));
+    </script>
+  </body>
+</html>
